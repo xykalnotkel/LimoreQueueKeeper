@@ -198,15 +198,33 @@
                         android:textStyle="bold"
                         android:letterSpacing="0.08" />
 
-                    <TextView
-                        android:id="@+id/tvShizukuStatus"
-                        android:layout_width="wrap_content"
+                    <LinearLayout
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Shizuku: Memeriksa..."
-                        android:textColor="#FFD54F"
-                        android:textSize="17sp"
-                        android:textStyle="bold"
-                        android:layout_marginTop="6dp" />
+                        android:orientation="horizontal"
+                        android:gravity="center_vertical"
+                        android:layout_marginTop="6dp">
+
+                        <TextView
+                            android:id="@+id/tvShizukuStatus"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="1"
+                            android:text="Shizuku: Memeriksa..."
+                            android:textColor="#FFD54F"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/btnRefreshShizuku"
+                            android:layout_width="wrap_content"
+                            android:layout_height="38dp"
+                            android:text="🔄 Refresh"
+                            android:textColor="#FFFFFF"
+                            android:textSize="11sp"
+                            app:cornerRadius="8dp"
+                            app:backgroundTint="#5E35B1" />
+                    </LinearLayout>
 
                     <TextView
                         android:layout_width="wrap_content"
@@ -214,7 +232,7 @@
                         android:text="Memberikan izin sistem tingkat lanjut untuk mengunci Limore agar tidak dimatikan Android Go."
                         android:textColor="#D1C4E9"
                         android:textSize="12sp"
-                        android:layout_marginTop="4dp" />
+                        android:layout_marginTop="6dp" />
                 </LinearLayout>
 
                 <!-- Tombol 1-Click Optimize -->

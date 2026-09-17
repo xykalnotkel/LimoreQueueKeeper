@@ -1,5 +1,6 @@
 package com.assistant.limorekeeper
 
+import android.app.ActivityOptions
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
@@ -44,6 +45,7 @@ class MainActivity : AppCompatActivity() {
 
     // Anti-Kill Views
     private lateinit var tvShizukuStatus: TextView
+    private lateinit var btnRefreshShizuku: Button
     private lateinit var btnShizukuOptimize: Button
     private lateinit var btnToggleFloatingBubble: Button
     private lateinit var btnLaunchFreeform: Button
@@ -60,6 +62,19 @@ class MainActivity : AppCompatActivity() {
     private var testRingtone: Ringtone? = null
     private val SHIZUKU_REQUEST_CODE = 2024
     private val mainHandler = Handler(Looper.getMainLooper())
+
+    // Shizuku Listeners
+    private val binderReceivedListener = Shizuku.OnBinderReceivedListener {
+        runOnUiThread {
+            updateStatus()
+        }
+    }
+
+    private val binderDeadListener = Shizuku.OnBinderDeadListener {
+        runOnUiThread {
+            updateStatus()
+        }
+    }
 
     private val permissionResultListener = Shizuku.OnRequestPermissionResultListener { requestCode, grantResult ->
         if (requestCode == SHIZUKU_REQUEST_CODE) {
@@ -85,7 +100,15 @@ class MainActivity : AppCompatActivity() {
         setupAntiKillActions()
         setupSettingsActions()
 
-        Shizuku.addRequestPermissionResultListener(permissionResultListener)
+        // Daftarkan listener Shizuku Sticky agar saat binder tiba langsung otomatis update
+        try {
+            Shizuku.addBinderReceivedListenerSticky(binderReceivedListener)
+            Shizuku.addBinderDeadListener(binderDeadListener)
+            Shizuku.addRequestPermissionResultListener(permissionResultListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
         updateStatus()
     }
 
@@ -105,6 +128,7 @@ class MainActivity : AppCompatActivity() {
 
         // Tab 2
         tvShizukuStatus = findViewById(R.id.tvShizukuStatus)
+        btnRefreshShizuku = findViewById(R.id.btnRefreshShizuku)
         btnShizukuOptimize = findViewById(R.id.btnShizukuOptimize)
         btnToggleFloatingBubble = findViewById(R.id.btnToggleFloatingBubble)
         btnLaunchFreeform = findViewById(R.id.btnLaunchFreeform)
@@ -177,6 +201,16 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun setupAntiKillActions() {
+        btnRefreshShizuku.setOnClickListener {
+            updateStatus()
+            val isAlive = isShizukuReady()
+            if (isAlive) {
+                Toast.makeText(this, "🟢 Shizuku Terhubung & Siap!", Toast.LENGTH_SHORT).show()
+            } else {
+                Toast.makeText(this, "🔴 Shizuku belum merespons. Pastikan Shizuku running di background.", Toast.LENGTH_LONG).show()
+            }
+        }
+
         btnShizukuOptimize.setOnClickListener {
             handleShizukuOptimizationClick()
         }
@@ -186,7 +220,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         btnLaunchFreeform.setOnClickListener {
-            launchLimoreInFreeform()
+            forceLaunchLimoreFloating()
         }
     }
 
@@ -203,6 +237,159 @@ class MainActivity : AppCompatActivity() {
 
         btnTestAlarm.setOnClickListener {
             triggerTestAlarm()
+        }
+    }
+
+    private fun isShizukuReady(): Boolean {
+        return try {
+            Shizuku.pingBinder()
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    private fun handleShizukuOptimizationClick() {
+        if (!isShizukuReady()) {
+            // Coba periksa sekali lagi secara instan
+            updateStatus()
+        }
+
+        if (!isShizukuReady()) {
+            AlertDialog.Builder(this)
+                .setTitle("Menghubungkan ke Shizuku")
+                .setMessage("Shizuku belum terdeteksi aktif oleh sistem.\n\nLangkah mudah:\n1. Buka aplikasi Shizuku di HP Anda.\n2. Pastikan tertulis 'Shizuku is running'.\n3. Kembali ke sini dan klik tombol '🔄 Refresh' di samping status.")
+                .setPositiveButton("Buka Shizuku") { _, _ ->
+                    val intent = packageManager.getLaunchIntentForPackage("moe.shizuku.privileged.api")
+                    if (intent != null) startActivity(intent)
+                    else Toast.makeText(this, "Aplikasi Shizuku belum terpasang!", Toast.LENGTH_SHORT).show()
+                }
+                .setNegativeButton("Tutup", null)
+                .show()
+            return
+        }
+
+        try {
+            if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
+                runAntiKillCommandsViaShizuku()
+            } else {
+                Shizuku.requestPermission(SHIZUKU_REQUEST_CODE)
+            }
+        } catch (e: Exception) {
+            Toast.makeText(this, "Gagal meminta izin: ${e.message}", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun runAntiKillCommandsViaShizuku() {
+        btnShizukuOptimize.isEnabled = false
+        btnShizukuOptimize.text = "⏳ Sedang Menerapkan Ultra Anti-Kill..."
+
+        Thread {
+            val commands = listOf(
+                // 1. Izin background mutlak
+                "cmd appops set com.lingwoyun.limore RUN_IN_BACKGROUND allow",
+                "cmd appops set com.lingwoyun.limore RUN_ANY_IN_BACKGROUND allow",
+                "cmd appops set com.lingwoyun.limore START_FOREGROUND allow",
+                // 2. Whitelist dari Doze & Battery Optimization
+                "dumpsys deviceidle whitelist +com.lingwoyun.limore",
+                "dumpsys deviceidle whitelist +com.assistant.limorekeeper",
+                // 3. Matikan Phantom Process Killer Android (anti kill streaming core)
+                "/system/bin/device_config put activity_manager max_phantom_processes 2147483647",
+                "settings put global settings_enable_monitor_phantom_procs false",
+                // 4. Cegah pembunuhan cached idle process
+                "device_config put activity_manager kill_bg_restricted_cached_idle false",
+                // 5. Aktifkan Mode Freeform & Resizable (Jendela Melayang) di Android Go
+                "settings put global enable_freeform_support 1",
+                "settings put global force_resizable_activities 1",
+                "settings put secure force_resizable_activities 1",
+                // 6. Kunci Kernel oom_score_adj Limore jika sedang aktif
+                "PID=\$(pidof com.lingwoyun.limore); if [ -n \"\$PID\" ]; then echo -900 > /proc/\$PID/oom_score_adj; fi"
+            )
+
+            val logs = StringBuilder()
+            for (cmd in commands) {
+                val (_, error) = runShellViaShizuku(arrayOf("sh", "-c", cmd))
+                if (error.isNotEmpty()) {
+                    logs.append("⚠️ $cmd\n")
+                } else {
+                    logs.append("✅ $cmd\n")
+                }
+            }
+
+            mainHandler.post {
+                btnShizukuOptimize.isEnabled = true
+                btnShizukuOptimize.text = "⚡ 1-Click Terapkan Ultra Anti-Kill"
+                AlertDialog.Builder(this)
+                    .setTitle("🔥 Ultra Anti-Kill Berhasil Diterapkan!")
+                    .setMessage("Semua proteksi tingkat kernel & sistem telah aktif:\n\n$logs\nLimore kini terlindung dari Low Memory Killer (LMK) dan mode Jendela Melayang sudah terbuka!")
+                    .setPositiveButton("Mantap!", null)
+                    .show()
+            }
+        }.start()
+    }
+
+    private fun forceLaunchLimoreFloating() {
+        Toast.makeText(this, "Memaksa Limore terbuka dalam mode Floating...", Toast.LENGTH_SHORT).show()
+
+        // 1. Ambil nama activity peluncur Limore
+        val launchIntent = packageManager.getLaunchIntentForPackage("com.lingwoyun.limore")
+        val componentName = launchIntent?.component?.flattenToShortString() ?: "com.lingwoyun.limore/.MainActivity"
+
+        // 2. Buka Bubble melayang agar tombol navigasi cepat tetap ada di layar
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M || Settings.canDrawOverlays(this)) {
+            val bubbleIntent = Intent(this, FloatingBubbleService::class.java)
+            startService(bubbleIntent)
+            isFloatingBubbleRunning = true
+            btnToggleFloatingBubble.text = "✖ Sembunyikan Bubble Melayang"
+        }
+
+        // 3. Eksekusi via Shizuku jika terhubung (perintah AM WindowingMode 5)
+        if (isShizukuReady() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
+            Thread {
+                val cmds = listOf(
+                    "settings put global enable_freeform_support 1",
+                    "settings put global force_resizable_activities 1",
+                    "am start --windowingMode 5 -n $componentName",
+                    "cmd activity start --windowingMode 5 -n $componentName",
+                    // Kunci oom_score_adj Limore seketika
+                    "sleep 1 && PID=\$(pidof com.lingwoyun.limore); if [ -n \"\$PID\" ]; then echo -900 > /proc/\$PID/oom_score_adj; fi"
+                )
+                for (c in cmds) {
+                    runShellViaShizuku(arrayOf("sh", "-c", c))
+                }
+            }.start()
+        }
+
+        // 4. Eksekusi via ActivityOptions reflection di level Java/Kotlin
+        try {
+            val options = ActivityOptions.makeBasic()
+            val method = ActivityOptions::class.java.getMethod("setLaunchWindowingMode", Int::class.javaPrimitiveType)
+            method.invoke(options, 5) // 5 = WINDOWING_MODE_FREEFORM
+
+            if (launchIntent != null) {
+                launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_MULTIPLE_TASK)
+                startActivity(launchIntent, options.toBundle())
+                return
+            }
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
+
+        // Fallback jika reflection gagal
+        launchLimoreApp()
+    }
+
+    private fun runShellViaShizuku(command: Array<String>): Pair<String, String> {
+        return try {
+            val clazz = Class.forName("rikka.shizuku.Shizuku")
+            val method = clazz.getDeclaredMethod("newProcess", Array<String>::class.java, Array<String>::class.java, String::class.java)
+            method.isAccessible = true
+            val remoteProcess = method.invoke(null, command, null, null) as java.lang.Process
+            val output = remoteProcess.inputStream.bufferedReader().use { it.readText() }
+            val error = remoteProcess.errorStream.bufferedReader().use { it.readText() }
+            remoteProcess.destroy()
+            Pair(output.trim(), error.trim())
+        } catch (e: Exception) {
+            Pair("", "Error: ${e.message}")
         }
     }
 
@@ -266,104 +453,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun launchLimoreInFreeform() {
-        try {
-            if (Shizuku.pingBinder() && Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
-                Thread {
-                    val cmd = arrayOf("sh", "-c", "am start -n com.lingwoyun.limore/.MainActivity --windowingMode 5 || am start -n com.lingwoyun.limore/com.lingwoyun.limore.MainActivity")
-                    runShellViaShizuku(cmd)
-                }.start()
-                Toast.makeText(this, "Membuka Limore dalam mode Freeform Window...", Toast.LENGTH_SHORT).show()
-                return
-            }
-        } catch (e: Exception) {
-            // fallback
-        }
-        launchLimoreApp()
-    }
-
-    private fun handleShizukuOptimizationClick() {
-        try {
-            if (!Shizuku.pingBinder()) {
-                AlertDialog.Builder(this)
-                    .setTitle("Shizuku Belum Aktif")
-                    .setMessage("Aplikasi Shizuku belum aktif di HP Anda.\n\nBuka aplikasi Shizuku, lalu jalankan via Wireless Debugging (tanpa PC).")
-                    .setPositiveButton("Buka Shizuku") { _, _ ->
-                        val intent = packageManager.getLaunchIntentForPackage("moe.shizuku.privileged.api")
-                        if (intent != null) startActivity(intent)
-                        else Toast.makeText(this, "Aplikasi Shizuku belum terpasang!", Toast.LENGTH_SHORT).show()
-                    }
-                    .setNegativeButton("Tutup", null)
-                    .show()
-                return
-            }
-
-            if (Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED) {
-                runAntiKillCommandsViaShizuku()
-            } else {
-                Shizuku.requestPermission(SHIZUKU_REQUEST_CODE)
-            }
-        } catch (e: Exception) {
-            Toast.makeText(this, "Error Shizuku: ${e.message}", Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun runAntiKillCommandsViaShizuku() {
-        btnShizukuOptimize.isEnabled = false
-        btnShizukuOptimize.text = "⏳ Sedang Menerapkan Anti-Kill..."
-
-        Thread {
-            val commands = listOf(
-                "cmd appops set com.lingwoyun.limore RUN_IN_BACKGROUND allow",
-                "dumpsys deviceidle whitelist +com.lingwoyun.limore",
-                "/system/bin/device_config put activity_manager max_phantom_processes 2147483647",
-                "settings put global settings_enable_monitor_phantom_procs false",
-                "settings put global enable_freeform_support 1",
-                "settings put global force_resizable_activities 1",
-                "cmd appops set com.assistant.limorekeeper RUN_IN_BACKGROUND allow",
-                "dumpsys deviceidle whitelist +com.assistant.limorekeeper"
-            )
-
-            val logs = StringBuilder()
-            for (cmd in commands) {
-                val (_, error) = runShellViaShizuku(arrayOf("sh", "-c", cmd))
-                if (error.isNotEmpty()) {
-                    logs.append("⚠️ $cmd\n")
-                } else {
-                    logs.append("✅ $cmd\n")
-                }
-            }
-
-            mainHandler.post {
-                btnShizukuOptimize.isEnabled = true
-                btnShizukuOptimize.text = "⚡ 1-Click Terapkan Anti-Kill"
-                AlertDialog.Builder(this)
-                    .setTitle("🎉 Proteksi Anti-Kill Diterapkan!")
-                    .setMessage("Pengaturan kernel & sistem Android Go berhasil dikonfigurasi:\n\n$logs\nLimore kini memiliki izin penuh di latar belakang dan mode Freeform aktif!")
-                    .setPositiveButton("Sip!", null)
-                    .show()
-            }
-        }.start()
-    }
-
-    private fun runShellViaShizuku(command: Array<String>): Pair<String, String> {
-        return try {
-            val clazz = Class.forName("rikka.shizuku.Shizuku")
-            val method = clazz.getDeclaredMethod("newProcess", Array<String>::class.java, Array<String>::class.java, String::class.java)
-            method.isAccessible = true
-            val remoteProcess = method.invoke(null, command, null, null) as java.lang.Process
-            val output = remoteProcess.inputStream.bufferedReader().use { it.readText() }
-            val error = remoteProcess.errorStream.bufferedReader().use { it.readText() }
-            remoteProcess.destroy()
-            Pair(output.trim(), error.trim())
-        } catch (e: Exception) {
-            Pair("", "Error: ${e.message}")
-        }
-    }
-
     override fun onDestroy() {
         super.onDestroy()
-        Shizuku.removeRequestPermissionResultListener(permissionResultListener)
+        try {
+            Shizuku.removeBinderReceivedListener(binderReceivedListener)
+            Shizuku.removeBinderDeadListener(binderDeadListener)
+            Shizuku.removeRequestPermissionResultListener(permissionResultListener)
+        } catch (e: Exception) {
+            e.printStackTrace()
+        }
         stopTestRingtone()
     }
 
@@ -383,23 +481,26 @@ class MainActivity : AppCompatActivity() {
         }
 
         if (isServiceRunning) {
-            tvStatus.text = "🟢 Pemantau Aktif (CPU Awake)"
+            tvStatus.text = "🟢 Proteksi Aktif (Kernel LMK Locked)"
             btnToggleService.text = "Hentikan Pemantau Antrean"
         } else {
             tvStatus.text = "⚪ Layanan Pemantau Nonaktif"
             btnToggleService.text = "Mulai Pantau Antrean"
         }
 
+        // Cek Status Shizuku
         try {
             if (Shizuku.pingBinder()) {
                 val isGranted = Shizuku.checkSelfPermission() == PackageManager.PERMISSION_GRANTED
                 if (isGranted) {
                     tvShizukuStatus.text = "Shizuku: 🟢 Terhubung & Siap"
+                    btnShizukuOptimize.isEnabled = true
                 } else {
                     tvShizukuStatus.text = "Shizuku: 🟡 Berjalan (Perlu Izin)"
+                    btnShizukuOptimize.isEnabled = true
                 }
             } else {
-                tvShizukuStatus.text = "Shizuku: 🔴 Belum Aktif"
+                tvShizukuStatus.text = "Shizuku: 🔴 Belum Merespons"
             }
         } catch (e: Exception) {
             tvShizukuStatus.text = "Shizuku: ⚪ Tidak Terdeteksi"
@@ -445,7 +546,7 @@ class MainActivity : AppCompatActivity() {
         }
         isServiceRunning = true
         updateStatus()
-        Toast.makeText(this, "Pemantau antrean aktif di background!", Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, "Pemantau antrean & Proteksi Kernel aktif!", Toast.LENGTH_SHORT).show()
     }
 
     private fun stopKeepAliveService() {
