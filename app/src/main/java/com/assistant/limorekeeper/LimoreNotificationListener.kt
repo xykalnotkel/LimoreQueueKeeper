@@ -37,60 +37,63 @@ class LimoreNotificationListener : NotificationListenerService() {
         if (sbn == null) return
 
         val pkgName = sbn.packageName ?: ""
-        // Deteksi paket Limore Cloud Game
         if (pkgName.contains("limore") || pkgName == "com.lingwoyun.limore") {
             val extras = sbn.notification.extras
             val title = extras.getString("android.title") ?: ""
             val text = extras.getCharSequence("android.text")?.toString() ?: ""
-            val fullContent = "$title $text".lowercase()
-
-            // Jika ada indikasi antrean siap / giliran main / notif penting
-            // Atau tangkap semua notifikasi dari Limore jika antrean selesai
             triggerAlarm(title, text)
         }
     }
 
     private fun triggerAlarm(title: String, message: String) {
         val context = applicationContext
+        val prefs = context.getSharedPreferences("limore_settings", Context.MODE_PRIVATE)
+        val soundEnabled = prefs.getBoolean("pref_sound", true)
+        val vibrateEnabled = prefs.getBoolean("pref_vibrate", true)
+        val autoLaunchEnabled = prefs.getBoolean("pref_auto_launch", true)
 
-        // 1. Bunyikan Alarm Keras
-        try {
-            val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
-                ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
-            ringtone = RingtoneManager.getRingtone(context, alarmUri)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-                ringtone?.audioAttributes = AudioAttributes.Builder()
-                    .setUsage(AudioAttributes.USAGE_ALARM)
-                    .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
-                    .build()
+        // 1. Bunyikan Alarm Keras jika diaktifkan
+        if (soundEnabled) {
+            try {
+                val alarmUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_ALARM)
+                    ?: RingtoneManager.getDefaultUri(RingtoneManager.TYPE_RINGTONE)
+                ringtone = RingtoneManager.getRingtone(context, alarmUri)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+                    ringtone?.audioAttributes = AudioAttributes.Builder()
+                        .setUsage(AudioAttributes.USAGE_ALARM)
+                        .setContentType(AudioAttributes.CONTENT_TYPE_SONIFICATION)
+                        .build()
+                }
+                ringtone?.play()
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-            ringtone?.play()
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
 
-        // 2. Getar Berulang
-        try {
-            vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-                val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
-                vibratorManager.defaultVibrator
-            } else {
-                @Suppress("DEPRECATION")
-                getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
-            }
+        // 2. Getar Berulang jika diaktifkan
+        if (vibrateEnabled) {
+            try {
+                vibrator = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+                    val vibratorManager = getSystemService(Context.VIBRATOR_MANAGER_SERVICE) as VibratorManager
+                    vibratorManager.defaultVibrator
+                } else {
+                    @Suppress("DEPRECATION")
+                    getSystemService(Context.VIBRATOR_SERVICE) as Vibrator
+                }
 
-            val pattern = longArrayOf(0, 800, 300, 800, 300, 1200)
-            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
-                vibrator?.vibrate(VibrationEffect.createWaveform(pattern, 0)) // 0 = loop
-            } else {
-                @Suppress("DEPRECATION")
-                vibrator?.vibrate(pattern, 0)
+                val pattern = longArrayOf(0, 800, 300, 800, 300, 1200)
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
+                    vibrator?.vibrate(VibrationEffect.createWaveform(pattern, 0))
+                } else {
+                    @Suppress("DEPRECATION")
+                    vibrator?.vibrate(pattern, 0)
+                }
+            } catch (e: Exception) {
+                e.printStackTrace()
             }
-        } catch (e: Exception) {
-            e.printStackTrace()
         }
 
-        // 3. Tampilkan Notifikasi Darurat & Tombol Buka Limore
+        // 3. Tampilkan Notifikasi Darurat
         val channelId = "limore_alert_channel"
         val notificationManager = getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
 
@@ -106,7 +109,6 @@ class LimoreNotificationListener : NotificationListenerService() {
             notificationManager.createNotificationChannel(channel)
         }
 
-        // Intent untuk langsung membuka Limore saat diklik
         val launchIntent = packageManager.getLaunchIntentForPackage("com.lingwoyun.limore")
             ?: Intent(this, MainActivity::class.java)
         launchIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
@@ -130,11 +132,13 @@ class LimoreNotificationListener : NotificationListenerService() {
 
         notificationManager.notify(9999, notification)
 
-        // Otomatis luncurkan Limore ke layar depan agar tidak kehabisan waktu timeout
-        try {
-            startActivity(launchIntent)
-        } catch (e: Exception) {
-            e.printStackTrace()
+        // 4. Auto-launch ke layar depan jika diaktifkan di pengaturan
+        if (autoLaunchEnabled) {
+            try {
+                startActivity(launchIntent)
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 }

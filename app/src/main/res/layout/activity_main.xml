@@ -1,126 +1,443 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#121212"
-    android:padding="20dp">
+    android:background="#12121A">
 
+    <!-- Top App Bar / Header -->
     <LinearLayout
+        android:id="@+id/layoutHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical">
+        android:orientation="vertical"
+        android:background="#181824"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="14dp"
+        android:elevation="4dp">
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="🎮 Limore Queue Keeper"
+            android:text="Limore Queue Keeper"
             android:textColor="#FFFFFF"
-            android:textSize="22sp"
-            android:textStyle="bold"
-            android:gravity="center"
-            android:layout_marginBottom="4dp" />
+            android:textSize="20sp"
+            android:textStyle="bold" />
 
         <TextView
-            android:layout_width="match_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Built for Redmi A2 (Android Go) • XyVerse"
-            android:textColor="#9E9E9E"
+            android:text="Redmi A2 Ultra Stability • by XyVerse"
+            android:textColor="#8F8FA8"
             android:textSize="12sp"
-            android:gravity="center"
-            android:layout_marginBottom="16dp" />
-
-        <TextView
-            android:id="@+id/tvStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Status: ⚪ Pemantau Nonaktif"
-            android:textColor="#00E676"
-            android:textSize="15sp"
-            android:gravity="center"
-            android:layout_marginBottom="6dp" />
-
-        <TextView
-            android:id="@+id/tvShizukuStatus"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Shizuku: Memeriksa..."
-            android:textColor="#FFD54F"
-            android:textSize="14sp"
-            android:gravity="center"
-            android:layout_marginBottom="20dp" />
-
-        <!-- Tombol Eksekusi Shizuku 1-Click -->
-        <Button
-            android:id="@+id/btnShizukuOptimize"
-            android:layout_width="match_parent"
-            android:layout_height="56dp"
-            android:text="⚡ 1-Click Terapkan Anti-Kill (Via Shizuku)"
-            android:backgroundTint="#7C4DFF"
-            android:textColor="#FFFFFF"
-            android:textStyle="bold"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btnToggleService"
-            android:layout_width="match_parent"
-            android:layout_height="50dp"
-            android:text="Mulai Pantau Antrean"
-            android:backgroundTint="#2979FF"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btnGrantNotifAccess"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="⚠️ Izinkan Akses Notifikasi"
-            android:backgroundTint="#FF9100"
-            android:textColor="#000000"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btnDisableBatteryOpt"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🔋 Matikan Pembatasan Baterai"
-            android:backgroundTint="#37474F"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btnOpenLimore"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🚀 Buka Aplikasi Limore"
-            android:backgroundTint="#00C853"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="12dp" />
-
-        <Button
-            android:id="@+id/btnStopAlarm"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="🔇 Matikan Bunyi Alarm"
-            android:backgroundTint="#D50000"
-            android:textColor="#FFFFFF"
-            android:layout_marginBottom="24dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="💡 CARA PAKAI SHIZUKU (TANPA PC):"
-            android:textColor="#FFD600"
-            android:textStyle="bold"
-            android:textSize="14sp"
-            android:layout_marginBottom="6dp" />
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="1. Buka aplikasi Shizuku di HP Anda lalu aktifkan lewat Wireless Debugging.\n2. Buka aplikasi ini, lalu klik tombol ungu '1-Click Terapkan Anti-Kill'.\n3. Setujui dialog izin Shizuku yang muncul.\n4. Sistem Android Go akan otomatis membebaskan Limore dari pembunuhan background dan mengaktifkan mode jendela melayang!"
-            android:textColor="#CCCCCC"
-            android:textSize="13sp"
-            android:lineSpacingExtra="4dp" />
-
+            android:layout_marginTop="2dp" />
     </LinearLayout>
-</ScrollView>
+
+    <!-- Scrollable Content Area -->
+    <FrameLayout
+        android:id="@+id/containerContent"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_below="@id/layoutHeader"
+        android:layout_above="@id/bottomNav">
+
+        <!-- ================= TAB 1: DASHBOARD / ANTREAN ================= -->
+        <ScrollView
+            android:id="@+id/tabDashboard"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:visibility="visible">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Card Status Antrean Realtime -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_dark"
+                    android:orientation="vertical"
+                    android:padding="18dp"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="STATUS MONITOR"
+                        android:textColor="#8F8FA8"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <TextView
+                        android:id="@+id/tvStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="⚪ Layanan Pemantau Nonaktif"
+                        android:textColor="#00E676"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="6dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Menjaga CPU dan socket antrean tidak tertidur di latar belakang."
+                        android:textColor="#B0B0C4"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Tombol Kontrol Utama -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnToggleService"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:text="Mulai Pantau Antrean"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="#2979FF"
+                    android:layout_marginBottom="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnOpenLimore"
+                    android:layout_width="match_parent"
+                    android:layout_height="54dp"
+                    android:text="🚀 Buka Aplikasi Limore"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="#00C853"
+                    android:layout_marginBottom="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStopAlarm"
+                    android:layout_width="match_parent"
+                    android:layout_height="50dp"
+                    android:text="🔇 Matikan Alarm &amp; Getar"
+                    android:textColor="#FFFFFF"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="#D50000"
+                    android:layout_marginBottom="14dp" />
+
+                <!-- Card Izin Cepat -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_dark"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AKSES &amp; OPTIMASI SISTEM"
+                        android:textColor="#8F8FA8"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08"
+                        android:layout_marginBottom="10dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGrantNotifAccess"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="⚠️ Izinkan Akses Notifikasi"
+                        android:textColor="#000000"
+                        app:cornerRadius="10dp"
+                        app:backgroundTint="#FFB300"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnDisableBatteryOpt"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="🔋 Bebaskan dari Hemat Baterai"
+                        android:textColor="#FFFFFF"
+                        app:cornerRadius="10dp"
+                        app:backgroundTint="#2D2D42" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ================= TAB 2: ANTI-KILL & FLOATING ================= -->
+        <ScrollView
+            android:id="@+id/tabAntiKill"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Card Shizuku Status -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_glow"
+                    android:orientation="vertical"
+                    android:padding="18dp"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="INTEGRASI SHIZUKU (ADB)"
+                        android:textColor="#C5B3F8"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <TextView
+                        android:id="@+id/tvShizukuStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Shizuku: Memeriksa..."
+                        android:textColor="#FFD54F"
+                        android:textSize="17sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="6dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Memberikan izin sistem tingkat lanjut untuk mengunci Limore agar tidak dimatikan Android Go."
+                        android:textColor="#D1C4E9"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+                <!-- Tombol 1-Click Optimize -->
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnShizukuOptimize"
+                    android:layout_width="match_parent"
+                    android:layout_height="56dp"
+                    android:text="⚡ 1-Click Terapkan Anti-Kill"
+                    android:textColor="#FFFFFF"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp"
+                    app:backgroundTint="#7C4DFF"
+                    android:layout_marginBottom="14dp" />
+
+                <!-- Card Fitur Floating Window -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_dark"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="FITUR BUBBLE / JENDELA MELAYANG"
+                        android:textColor="#8F8FA8"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tampilkan tombol bulat melayang di layar agar bisa buka Limore atau matikan alarm kapan saja tanpa keluar dari aplikasi lain."
+                        android:textColor="#B0B0C4"
+                        android:textSize="12sp"
+                        android:layout_marginTop="4dp"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnToggleFloatingBubble"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="🌐 Tampilkan Bubble Melayang"
+                        android:textColor="#FFFFFF"
+                        app:cornerRadius="10dp"
+                        app:backgroundTint="#0091EA"
+                        android:layout_marginBottom="8dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnLaunchFreeform"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="🪟 Paksa Limore Mode Freeform"
+                        android:textColor="#FFFFFF"
+                        app:cornerRadius="10dp"
+                        app:backgroundTint="#00B0FF" />
+                </LinearLayout>
+
+                <!-- Penjelasan Cara Kerja -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_dark"
+                    android:orientation="vertical"
+                    android:padding="16dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="APA YANG DILAKUKAN TOMBOL ANTI-KILL?"
+                        android:textColor="#FFD600"
+                        android:textSize="11sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="1. RUN_IN_BACKGROUND: Limore diizinkan aktif penuh di background.\n2. DEVICEIDLE WHITELIST: Limore bebas dari Deep Sleep/Doze.\n3. PHANTOM PROCESS: Android Go dilarang mematikan subprocess Limore.\n4. FREEFORM: Mengaktifkan mode jendela melayang bawaan sistem."
+                        android:textColor="#9E9EAF"
+                        android:textSize="12sp"
+                        android:lineSpacingExtra="3dp"
+                        android:layout_marginTop="6dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+        <!-- ================= TAB 3: PENGATURAN (SETTINGS) ================= -->
+        <ScrollView
+            android:id="@+id/tabSettings"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="16dp"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Card Pengaturan Alarm & Respon -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_dark"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:layout_marginBottom="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PENGATURAN ALARM &amp; NOTIFIKASI"
+                        android:textColor="#8F8FA8"
+                        android:textSize="11sp"
+                        android:textStyle="bold"
+                        android:letterSpacing="0.08"
+                        android:layout_marginBottom="8dp" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchAutoLaunch"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Buka Limore Otomatis Saat Siap"
+                        android:textColor="#FFFFFF"
+                        android:checked="true" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#2D2D42" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchSoundAlarm"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Bunyikan Suara Alarm"
+                        android:textColor="#FFFFFF"
+                        android:checked="true" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#2D2D42" />
+
+                    <androidx.appcompat.widget.SwitchCompat
+                        android:id="@+id/switchVibrate"
+                        android:layout_width="match_parent"
+                        android:layout_height="48dp"
+                        android:text="Getarkan Ponsel Berulang"
+                        android:textColor="#FFFFFF"
+                        android:checked="true" />
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#2D2D42"
+                        android:layout_marginBottom="12dp" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnTestAlarm"
+                        android:layout_width="match_parent"
+                        android:layout_height="46dp"
+                        android:text="🔔 Uji Coba Suara &amp; Getar"
+                        android:textColor="#FFFFFF"
+                        app:cornerRadius="10dp"
+                        app:backgroundTint="#37474F" />
+                </LinearLayout>
+
+                <!-- Card Tentang & Ekosistem XyVerse -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_dark"
+                    android:orientation="vertical"
+                    android:padding="16dp"
+                    android:gravity="center">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Limore Queue Keeper v1.2.0"
+                        android:textColor="#FFFFFF"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Crafted with ❤️ for Redmi A2 (Android Go)"
+                        android:textColor="#9E9EAF"
+                        android:textSize="12sp"
+                        android:layout_marginTop="2dp" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Built-in XyVerse Ecosystem"
+                        android:textColor="#7C4DFF"
+                        android:textSize="12sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp" />
+                </LinearLayout>
+
+            </LinearLayout>
+        </ScrollView>
+
+    </FrameLayout>
+
+    <!-- Bottom Navigation Bar (3 Menu) -->
+    <com.google.android.material.bottomnavigation.BottomNavigationView
+        android:id="@+id/bottomNav"
+        android:layout_width="match_parent"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:background="#181824"
+        app:itemIconTint="@color/bottom_nav_colors"
+        app:itemTextColor="@color/bottom_nav_colors"
+        app:menu="@menu/bottom_nav_menu"
+        app:labelVisibilityMode="labeled"
+        android:elevation="8dp" />
+
+</RelativeLayout>

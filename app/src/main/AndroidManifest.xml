@@ -48,6 +48,12 @@
             </intent-filter>
         </service>
 
+        <!-- Service Floating Bubble Menu Melayang -->
+        <service
+            android:name=".FloatingBubbleService"
+            android:enabled="true"
+            android:exported="false" />
+
     </application>
 
 </manifest>

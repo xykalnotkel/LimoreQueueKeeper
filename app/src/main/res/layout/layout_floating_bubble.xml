@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:gravity="center_horizontal"
+    android:padding="4dp">
+
+    <!-- Ikon Bubble Utama -->
+    <ImageView
+        android:id="@+id/imgBubbleIcon"
+        android:layout_width="54dp"
+        android:layout_height="54dp"
+        android:background="@drawable/bg_card_glow"
+        android:padding="12dp"
+        android:src="@drawable/ic_floating_window"
+        android:contentDescription="Limore Bubble"
+        android:elevation="8dp" />
+
+    <!-- Menu Melayang yang bisa dibuka tutup -->
+    <LinearLayout
+        android:id="@+id/layoutBubbleMenu"
+        android:layout_width="160dp"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@drawable/bg_card_dark"
+        android:padding="8dp"
+        android:layout_marginTop="6dp"
+        android:visibility="gone"
+        android:elevation="10dp">
+
+        <TextView
+            android:id="@+id/btnBubbleLaunchLimore"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="10dp"
+            android:text="🚀 Buka Limore"
+            android:textColor="#00E676"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#2D2D42"
+            android:layout_marginVertical="4dp" />
+
+        <TextView
+            android:id="@+id/btnBubbleStopAlarm"
+            android:layout_width="match_parent"
+            android:layout_height="38dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="10dp"
+            android:text="🔇 Matikan Alarm"
+            android:textColor="#FF5252"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:background="?android:attr/selectableItemBackground" />
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#2D2D42"
+            android:layout_marginVertical="4dp" />
+
+        <TextView
+            android:id="@+id/btnBubbleClose"
+            android:layout_width="match_parent"
+            android:layout_height="32dp"
+            android:gravity="center_vertical"
+            android:paddingHorizontal="10dp"
+            android:text="✖ Tutup Bubble"
+            android:textColor="#9E9E9E"
+            android:textSize="12sp"
+            android:background="?android:attr/selectableItemBackground" />
+
+    </LinearLayout>
+
+</LinearLayout>
