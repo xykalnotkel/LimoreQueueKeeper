@@ -18,7 +18,16 @@
             android:textSize="22sp"
             android:textStyle="bold"
             android:gravity="center"
-            android:layout_marginBottom="8dp" />
+            android:layout_marginBottom="4dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Built for Redmi A2 (Android Go) • XyVerse"
+            android:textColor="#9E9E9E"
+            android:textSize="12sp"
+            android:gravity="center"
+            android:layout_marginBottom="16dp" />
 
         <TextView
             android:id="@+id/tvStatus"
@@ -26,14 +35,35 @@
             android:layout_height="wrap_content"
             android:text="Status: ⚪ Pemantau Nonaktif"
             android:textColor="#00E676"
-            android:textSize="16sp"
+            android:textSize="15sp"
             android:gravity="center"
-            android:layout_marginBottom="24dp" />
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:id="@+id/tvShizukuStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Shizuku: Memeriksa..."
+            android:textColor="#FFD54F"
+            android:textSize="14sp"
+            android:gravity="center"
+            android:layout_marginBottom="20dp" />
+
+        <!-- Tombol Eksekusi Shizuku 1-Click -->
+        <Button
+            android:id="@+id/btnShizukuOptimize"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="⚡ 1-Click Terapkan Anti-Kill (Via Shizuku)"
+            android:backgroundTint="#7C4DFF"
+            android:textColor="#FFFFFF"
+            android:textStyle="bold"
+            android:layout_marginBottom="12dp" />
 
         <Button
             android:id="@+id/btnToggleService"
             android:layout_width="match_parent"
-            android:layout_height="56dp"
+            android:layout_height="50dp"
             android:text="Mulai Pantau Antrean"
             android:backgroundTint="#2979FF"
             android:textColor="#FFFFFF"
@@ -78,7 +108,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="📌 PANDUAN PENTING DI REDMI A2 (ANDROID GO):"
+            android:text="💡 CARA PAKAI SHIZUKU (TANPA PC):"
             android:textColor="#FFD600"
             android:textStyle="bold"
             android:textSize="14sp"
@@ -87,7 +117,7 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="1. Di Android Go, sistem mematikan aplikasi background jika membuka aplikasi berat.\n2. Aktifkan 'Mulai Pantau Antrean' di aplikasi ini.\n3. Jangan buka game lain atau TikTok saat antre (buka yang ringan seperti WA/browser mini).\n4. Begitu giliran main Limore tiba, HP akan otomatis menyalakan alarm dan meluncurkan Limore ke layar depan."
+            android:text="1. Buka aplikasi Shizuku di HP Anda lalu aktifkan lewat Wireless Debugging.\n2. Buka aplikasi ini, lalu klik tombol ungu '1-Click Terapkan Anti-Kill'.\n3. Setujui dialog izin Shizuku yang muncul.\n4. Sistem Android Go akan otomatis membebaskan Limore dari pembunuhan background dan mengaktifkan mode jendela melayang!"
             android:textColor="#CCCCCC"
             android:textSize="13sp"
             android:lineSpacingExtra="4dp" />
