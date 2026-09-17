@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#121212"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🎮 Limore Queue Keeper"
+            android:textColor="#FFFFFF"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="8dp" />
+
+        <TextView
+            android:id="@+id/tvStatus"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Status: ⚪ Pemantau Nonaktif"
+            android:textColor="#00E676"
+            android:textSize="16sp"
+            android:gravity="center"
+            android:layout_marginBottom="24dp" />
+
+        <Button
+            android:id="@+id/btnToggleService"
+            android:layout_width="match_parent"
+            android:layout_height="56dp"
+            android:text="Mulai Pantau Antrean"
+            android:backgroundTint="#2979FF"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnGrantNotifAccess"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="⚠️ Izinkan Akses Notifikasi"
+            android:backgroundTint="#FF9100"
+            android:textColor="#000000"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnDisableBatteryOpt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔋 Matikan Pembatasan Baterai"
+            android:backgroundTint="#37474F"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnOpenLimore"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🚀 Buka Aplikasi Limore"
+            android:backgroundTint="#00C853"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="12dp" />
+
+        <Button
+            android:id="@+id/btnStopAlarm"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="🔇 Matikan Bunyi Alarm"
+            android:backgroundTint="#D50000"
+            android:textColor="#FFFFFF"
+            android:layout_marginBottom="24dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="📌 PANDUAN PENTING DI REDMI A2 (ANDROID GO):"
+            android:textColor="#FFD600"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:layout_marginBottom="6dp" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="1. Di Android Go, sistem mematikan aplikasi background jika membuka aplikasi berat.\n2. Aktifkan 'Mulai Pantau Antrean' di aplikasi ini.\n3. Jangan buka game lain atau TikTok saat antre (buka yang ringan seperti WA/browser mini).\n4. Begitu giliran main Limore tiba, HP akan otomatis menyalakan alarm dan meluncurkan Limore ke layar depan."
+            android:textColor="#CCCCCC"
+            android:textSize="13sp"
+            android:lineSpacingExtra="4dp" />
+
+    </LinearLayout>
+</ScrollView>
